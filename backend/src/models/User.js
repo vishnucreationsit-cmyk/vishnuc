@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -42,28 +41,17 @@ const userSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Pre-save hook to hash password and pin
-userSchema.pre('save', async function() {
-  if (this.isModified('password')) {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-  }
-  
-  if (this.isModified('pin') && this.pin) {
-    const salt = await bcrypt.genSalt(10);
-    this.pin = await bcrypt.hash(this.pin, salt);
-  }
-});
+// Removed pre-save hook for hashing
 
-// Method to check password
+// Method to check password (Plaintext comparison)
 userSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  return enteredPassword === this.password;
 };
 
-// Method to check pin
+// Method to check pin (Plaintext comparison)
 userSchema.methods.matchPin = async function(enteredPin) {
   if (!this.pin) return false;
-  return await bcrypt.compare(enteredPin, this.pin);
+  return enteredPin === this.pin;
 };
 
 module.exports = mongoose.model('User', userSchema);
