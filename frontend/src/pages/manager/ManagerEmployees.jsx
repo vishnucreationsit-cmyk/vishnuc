@@ -22,7 +22,7 @@ const ManagerEmployees = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/manager/employees', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/manager/employees`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -48,7 +48,7 @@ const ManagerEmployees = () => {
     setError('');
     
     try {
-      const res = await fetch('http://localhost:5000/api/manager/employees', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/manager/employees`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ const ManagerEmployees = () => {
 
   const toggleStatus = async (id, currentStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/manager/employees/${id}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/manager/employees/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

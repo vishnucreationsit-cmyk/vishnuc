@@ -20,7 +20,7 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     const fetchTodayStatus = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/employee/attendance/history?limit=1', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/employee/attendance/history?limit=1`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -81,7 +81,7 @@ const EmployeeDashboard = () => {
     }
     
     try {
-      const res = await fetch('http://localhost:5000/api/employee/attendance/check-in', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/employee/attendance/check-in`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ const EmployeeDashboard = () => {
     if (!isCheckedIn) return;
     if (window.confirm("Are you sure you want to check out for the day?")) {
       try {
-        const res = await fetch('http://localhost:5000/api/employee/attendance/check-out', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/employee/attendance/check-out`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`

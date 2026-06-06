@@ -13,7 +13,7 @@ const ManagerOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/manager/orders', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/manager/orders`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -35,7 +35,7 @@ const ManagerOrders = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/manager/orders/${orderId}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/manager/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

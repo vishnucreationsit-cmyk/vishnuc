@@ -3,8 +3,15 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
+const connectDB = require('./config/db');
 
 const app = express();
+
+// Ensure DB is connected for serverless environments
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // Security Middlewares
 app.use(helmet());

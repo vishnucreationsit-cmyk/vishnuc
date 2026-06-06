@@ -16,7 +16,7 @@ const AdminManagers = () => {
 
   const fetchManagers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/managers', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/admin/managers`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -43,7 +43,7 @@ const AdminManagers = () => {
     setIsSubmitting(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:5000/api/admin/managers', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/admin/managers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ const AdminManagers = () => {
 
   const toggleStatus = async (id, currentStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/managers/${id}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/admin/managers/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ const AdminManagers = () => {
   const deleteManager = async (id) => {
     if (!window.confirm('Are you sure you want to delete this manager?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/managers/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/admin/managers/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

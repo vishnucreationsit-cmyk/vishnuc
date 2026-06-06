@@ -17,10 +17,10 @@ const EmployeeHistory = () => {
     const fetchData = async () => {
       try {
         const [historyRes, reportRes] = await Promise.all([
-          fetch('http://localhost:5000/api/employee/attendance/history', {
+          fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/employee/attendance/history`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
-          fetch('http://localhost:5000/api/employee/attendance/report', {
+          fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/employee/attendance/report`, {
             headers: { 'Authorization': `Bearer ${token}` }
           })
         ]);
