@@ -116,7 +116,7 @@ const AdminOrders = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <a href=`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/admin/orders/export` target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-primary-600 hover:bg-primary-50 bg-white font-medium transition-colors">
+          <a href={`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/admin/orders/export`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-primary-600 hover:bg-primary-50 bg-white font-medium transition-colors">
             Export Excel
           </a>
         </div>
