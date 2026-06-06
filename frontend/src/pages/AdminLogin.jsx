@@ -19,7 +19,7 @@ const AdminLogin = () => {
       const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password: password.trim() }),
       });
       
       const data = await response.json();
