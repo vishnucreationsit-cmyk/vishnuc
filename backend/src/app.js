@@ -9,8 +9,12 @@ const app = express();
 
 // Ensure DB is connected for serverless environments
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: 'Database connection failed', message: err.message });
+  }
 });
 
 // Security Middlewares
