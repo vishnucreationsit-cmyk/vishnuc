@@ -8,15 +8,15 @@ const seedAdmin = async () => {
     console.log('Connected to DB');
 
     const adminData = {
-      name: 'tarun',
-      email: 'tarunsaikolaa@gmail.com',
-      password: 'tarun@123',
+      name: 'Eshwar',
+      email: 'cheshwar4400@gmail.com',
+      password: 'Eshwar@123',
       role: 'ADMIN',
       pin: '1234',
       status: 'ACTIVE'
     };
 
-    let user = await User.findOne({ email: 'tarunsaikolaa@gmail.com' });
+    let user = await User.findOne({ email: 'cheshwar4400@gmail.com' });
     if (user) {
       user.name = adminData.name;
       user.password = adminData.password;
@@ -24,10 +24,10 @@ const seedAdmin = async () => {
       user.pin = adminData.pin;
       user.status = adminData.status;
       await user.save();
-      console.log('Admin user Tarun updated successfully!');
+      console.log('Admin user Eshwar updated successfully!');
     } else {
       await User.create(adminData);
-      console.log('Admin user Tarun created successfully!');
+      console.log('Admin user Eshwar created successfully!');
     }
 
     process.exit(0);

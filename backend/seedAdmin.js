@@ -8,23 +8,23 @@ const seedAdmin = async () => {
     console.log('Connected to MongoDB');
     
     // Check if user exists
-    const existingAdmin = await User.findOne({ email: 'tarunsaikolaa@gmail.com' });
+    const existingAdmin = await User.findOne({ email: 'cheshwar4400@gmail.com' });
     if (existingAdmin) {
       console.log('Admin user already exists.');
       process.exit(0);
     }
 
     const admin = new User({
-      name: 'tarun',
-      email: 'tarunsaikolaa@gmail.com',
-      password: 'tarun@123',
+      name: 'Eshwar',
+      email: 'cheshwar4400@gmail.com',
+      password: 'Eshwar@123',
       role: 'ADMIN',
       pin: '1234',
       status: 'ACTIVE'
     });
 
     await admin.save();
-    console.log('Admin user Tarun inserted successfully!');
+    console.log('Admin user Eshwar inserted successfully!');
     process.exit(0);
   } catch (err) {
     console.error('Error inserting admin:', err);
