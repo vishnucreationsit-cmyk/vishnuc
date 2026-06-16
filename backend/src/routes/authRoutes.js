@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
-const { registerUser, loginUser, logoutUser, refreshToken, employeeLogin, sendAdminOtp, verifyAdminOtp } = require('../controllers/authController');
+const { registerUser, loginUser, logoutUser, refreshToken, employeeLogin, sendAdminOtp, verifyAdminOtp, emergencySeed } = require('../controllers/authController');
 const { protect, authorizeRoles } = require('../middlewares/authMiddleware');
 
 // Input Validation Middlewares
@@ -58,6 +58,6 @@ router.get('/admin-dashboard', protect, authorizeRoles('ADMIN'), (req, res) => {
 
 // IMPORTANT: Emergency Seed Endpoint
 // This allows the user to force-seed the admin directly on the live site
-router.get('/emergency-seed', authController.emergencySeed);
+router.get('/emergency-seed', emergencySeed);
 
 module.exports = router;
