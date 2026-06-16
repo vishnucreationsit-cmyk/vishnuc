@@ -27,6 +27,9 @@ const attendanceSchema = new mongoose.Schema({
       type: Number,
       required: true
     },
+    distanceFromOffice: {
+      type: Number
+    },
     address: {
       type: String
     }

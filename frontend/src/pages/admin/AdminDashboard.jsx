@@ -14,6 +14,8 @@ const AdminDashboard = () => {
     totalEmployees: 0,
     totalOrders: 0,
     pendingOrders: 0,
+    inProduction: 0,
+    readyForDispatch: 0,
     completedOrders: 0,
     revenueData: [],
     ordersPerMonthData: [],
@@ -46,7 +48,9 @@ const AdminDashboard = () => {
     { title: 'Total Employees', value: stats.totalEmployees, icon: Users, color: 'text-green-600', bg: 'bg-green-100' },
     { title: 'Total Orders', value: stats.totalOrders, icon: PackageSearch, color: 'text-purple-600', bg: 'bg-purple-100' },
     { title: 'Pending Orders', value: stats.pendingOrders, icon: Clock, color: 'text-orange-600', bg: 'bg-orange-100' },
-    { title: 'Completed Orders', value: stats.completedOrders, icon: CheckCircle, color: 'text-teal-600', bg: 'bg-teal-100' },
+    { title: 'In Production', value: stats.inProduction || 0, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
+    { title: 'Ready for Dispatch', value: stats.readyForDispatch || 0, icon: PackageSearch, color: 'text-pink-600', bg: 'bg-pink-100' },
+    { title: 'Delivered', value: stats.completedOrders, icon: CheckCircle, color: 'text-teal-600', bg: 'bg-teal-100' },
   ];
 
   return (
@@ -58,7 +62,7 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
         {statCards.map((card, idx) => (
-          <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-shadow md:hover:shadow-md select-none">
             <div className={`inline-flex p-3 rounded-xl ${card.bg} ${card.color} mb-4`}>
               <card.icon className="w-6 h-6" />
             </div>
@@ -72,7 +76,7 @@ const AdminDashboard = () => {
         {/* Revenue Growth - Area Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-6">Revenue Growth</h2>
-          <div className="h-72">
+          <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stats.revenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
@@ -94,7 +98,7 @@ const AdminDashboard = () => {
         {/* Orders Per Month - Bar Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-6">Orders Per Month</h2>
-          <div className="h-72">
+          <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.ordersPerMonthData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -112,7 +116,7 @@ const AdminDashboard = () => {
         {/* Attendance Trends - Line Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:col-span-2">
           <h2 className="text-lg font-bold text-gray-900 mb-6">Attendance Trends (This Week)</h2>
-          <div className="h-72 flex items-center justify-center text-gray-400">
+          <div className="h-48 flex items-center justify-center text-gray-400">
              Live Attendance Reporting Temporarily Hidden
           </div>
         </div>
@@ -120,7 +124,7 @@ const AdminDashboard = () => {
         {/* Order Status Distribution - Pie Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-6">Order Distribution</h2>
-          <div className="h-72 flex flex-col justify-center">
+          <div className="h-48 flex flex-col justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -146,7 +150,7 @@ const AdminDashboard = () => {
 
       <div className="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-6">Manager Performance (Orders Handled)</h2>
-        <div className="h-72 flex items-center justify-center text-gray-400">
+        <div className="h-48 flex items-center justify-center text-gray-400">
            Manager Reporting Temporarily Hidden
         </div>
       </div>

@@ -12,8 +12,13 @@ import AttendanceLogin from './pages/AttendanceLogin';
 import AdminLayout from './components/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminManagers from './pages/admin/AdminManagers';
+import AdminEmployees from './pages/admin/AdminEmployees';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminAttendance from './pages/admin/AdminAttendance';
+import AdminEmailLogs from './pages/admin/AdminEmailLogs';
+
+// Shared Components
+import OrderDetails from './pages/shared/OrderDetails';
 
 // Manager Components
 import ManagerLayout from './components/ManagerLayout';
@@ -46,8 +51,11 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="managers" element={<AdminManagers />} />
+          <Route path="employees" element={<AdminEmployees />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="orders/:id" element={<OrderDetails />} />
           <Route path="attendance" element={<AdminAttendance />} />
+          <Route path="emails" element={<AdminEmailLogs />} />
         </Route>
 
         {/* Manager Routes */}
@@ -56,6 +64,7 @@ function App() {
           <Route path="employees" element={<ManagerEmployees />} />
           <Route path="orders" element={<ManagerOrders />} />
           <Route path="orders/add" element={<ManagerAddOrder />} />
+          <Route path="orders/:id" element={<OrderDetails />} />
           <Route path="attendance" element={<ManagerAttendance />} />
         </Route>
 

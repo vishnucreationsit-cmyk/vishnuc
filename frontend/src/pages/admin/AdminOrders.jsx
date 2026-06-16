@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, Eye, Plus, X } from 'lucide-react';
+import { Search, Filter, Eye, Plus, X, Edit } from 'lucide-react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import EditOrderModal from '../../components/orders/EditOrderModal';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -8,6 +10,10 @@ const AdminOrders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  // Edit Modal State
+  const [editingOrder, setEditingOrder] = useState(null);
 
   // Add Order Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -18,8 +24,8 @@ const AdminOrders = () => {
     mobileNumber: '',
     productName: '',
     category: 'LEATHER_BAGS',
-    quantity: 1,
-    unitPrice: 0,
+    quantity: '',
+    unitPrice: '',
     dueDate: '',
     priority: 'MEDIUM',
     description: ''
@@ -67,7 +73,7 @@ const AdminOrders = () => {
         setIsAddModalOpen(false);
         setNewOrder({
           company: '', contactPerson: '', mobileNumber: '', productName: '',
-          category: 'LEATHER_BAGS', quantity: 1, unitPrice: 0, dueDate: '',
+          category: 'LEATHER_BAGS', quantity: '', unitPrice: '', dueDate: '',
           priority: 'MEDIUM', description: ''
         });
         fetchOrders(); // Refresh list
@@ -144,7 +150,7 @@ const AdminOrders = () => {
                   <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="p-4 font-medium text-gray-900">{order.company}</td>
                     <td className="p-4 text-gray-600">{order.productName}</td>
-                    <td className="p-4 text-gray-900 font-medium">${(order.totalValue || 0).toLocaleString()}</td>
+                    <td className="p-4 text-gray-900 font-medium">₹{(order.totalValue || 0).toLocaleString()}</td>
                     <td className="p-4 text-gray-500 text-sm">{new Date(order.dueDate).toLocaleDateString()}</td>
                     <td className="p-4">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${order.priority === 'HIGH' || order.priority === 'URGENT' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
@@ -152,12 +158,20 @@ const AdminOrders = () => {
                       </span>
                     </td>
                     <td className="p-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${order.status === 'COMPLETED' || order.status === 'DELIVERED' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+                        ['Delivered', 'COMPLETED', 'DELIVERED'].includes(order.status) ? 'bg-green-50 text-green-700 border-green-200' : 
+                        ['Cancelled', 'CANCELLED'].includes(order.status) ? 'bg-red-50 text-red-700 border-red-200' : 
+                        ['Ready For Dispatch', 'Packing'].includes(order.status) ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                        'bg-blue-50 text-blue-700 border-blue-200'
+                      }`}>
                         {order.status}
                       </span>
                     </td>
-                    <td className="p-4 text-right">
-                      <button className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors">
+                    <td className="p-4 text-right flex justify-end gap-2">
+                      <button onClick={() => setEditingOrder(order)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <Edit className="w-5 h-5" />
+                      </button>
+                      <button onClick={() => navigate(`/admin/orders/${order._id}`)} className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors">
                         <Eye className="w-5 h-5" />
                       </button>
                     </td>
@@ -226,12 +240,12 @@ const AdminOrders = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
                   <input type="number" min="1" required className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                    value={newOrder.quantity} onChange={(e) => setNewOrder({...newOrder, quantity: Number(e.target.value)})} />
+                    value={newOrder.quantity} onChange={(e) => setNewOrder({...newOrder, quantity: e.target.value === '' ? '' : Number(e.target.value)})} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Unit Price ($)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Unit Price (₹)</label>
                   <input type="number" min="0" step="0.01" required className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                    value={newOrder.unitPrice} onChange={(e) => setNewOrder({...newOrder, unitPrice: Number(e.target.value)})} />
+                    value={newOrder.unitPrice} onChange={(e) => setNewOrder({...newOrder, unitPrice: e.target.value === '' ? '' : Number(e.target.value)})} />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
@@ -258,6 +272,17 @@ const AdminOrders = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Edit Order Modal */}
+      {editingOrder && (
+        <EditOrderModal 
+          order={editingOrder} 
+          onClose={() => setEditingOrder(null)} 
+          onRefresh={fetchOrders} 
+          token={token} 
+          isManager={false} 
+        />
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Edit2, Power, X } from 'lucide-react';
+import { Search, Plus, Edit2, Power, X, Mail, Loader2 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 const ManagerEmployees = () => {
@@ -19,6 +19,7 @@ const ManagerEmployees = () => {
     password: '',
     pin: ''
   });
+  const [sendingCredentialsId, setSendingCredentialsId] = useState(null);
 
   const fetchEmployees = async () => {
     try {
@@ -88,6 +89,26 @@ const ManagerEmployees = () => {
     }
   };
 
+  const sendCredentials = async (id) => {
+    setSendingCredentialsId(id);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/manager/employees/${id}/send-credentials`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Credentials sent successfully!');
+      } else {
+        alert(`${data.message}${data.error ? `: ${data.error}` : ''}` || 'Failed to send credentials.');
+      }
+    } catch (err) {
+      alert('Network Error while sending credentials.');
+    } finally {
+      setSendingCredentialsId(null);
+    }
+  };
+
   const filteredEmployees = employees.filter(emp => 
     emp.name.toLowerCase().includes(search.toLowerCase()) || 
     emp.email.toLowerCase().includes(search.toLowerCase())
@@ -151,6 +172,14 @@ const ManagerEmployees = () => {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => sendCredentials(emp._id)}
+                          disabled={sendingCredentialsId === emp._id}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50" 
+                          title="Send Credentials via Email"
+                        >
+                          {sendingCredentialsId === emp._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                        </button>
                         <button 
                           onClick={() => toggleStatus(emp._id, emp.status)}
                           className={`p-2 rounded-lg transition-colors ${emp.status === 'ACTIVE' ? 'text-orange-600 hover:bg-orange-50' : 'text-green-600 hover:bg-green-50'}`} 

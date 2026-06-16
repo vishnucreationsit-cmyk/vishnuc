@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
-const { registerUser, loginUser, logoutUser, refreshToken, employeeLogin } = require('../controllers/authController');
+const { registerUser, loginUser, logoutUser, refreshToken, employeeLogin, sendAdminOtp, verifyAdminOtp } = require('../controllers/authController');
 const { protect, authorizeRoles } = require('../middlewares/authMiddleware');
 
 // Input Validation Middlewares
@@ -34,6 +34,8 @@ const validateLogin = [
 router.post('/register', validateRegistration, registerUser);
 router.post('/login', validateLogin, loginUser);
 router.post('/employee-login', employeeLogin);
+router.post('/admin-send-otp', sendAdminOtp);
+router.post('/admin-verify-otp', verifyAdminOtp);
 router.post('/logout', logoutUser);
 router.post('/refresh', refreshToken);
 

@@ -11,6 +11,23 @@ const EmployeeDashboard = () => {
   
   const { token } = useSelector((state) => state.auth);
 
+  const HQ_LAT = 12.841500;
+  const HQ_LNG = 80.089917;
+  const HQ_RADIUS = 100;
+
+  // Helper to calculate distance in meters using Haversine formula
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371e3;
+    const rad = Math.PI / 180;
+    const dLat = (lat2 - lat1) * rad;
+    const dLon = (lon2 - lon1) * rad;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * rad) * Math.cos(lat2 * rad) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
@@ -58,9 +75,11 @@ const EmployeeDashboard = () => {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const dist = getDistance(position.coords.latitude, position.coords.longitude, HQ_LAT, HQ_LNG);
         setLocation({ 
           latitude: position.coords.latitude, 
           longitude: position.coords.longitude, 
+          distance: Math.round(dist),
           address: 'GPS Verified' 
         });
         setLocating(false);
@@ -105,13 +124,19 @@ const EmployeeDashboard = () => {
 
   const handleCheckOut = async () => {
     if (!isCheckedIn) return;
+    if (!location) {
+      alert("Please verify your location before checking out!");
+      return;
+    }
     if (window.confirm("Are you sure you want to check out for the day?")) {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/employee/attendance/check-out`, {
           method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
-          }
+          },
+          body: JSON.stringify({ location })
         });
         
         if (res.ok) {
@@ -163,9 +188,17 @@ const EmployeeDashboard = () => {
                   <MapPin className="w-4 h-4 text-blue-600" /> Location Status
                 </h3>
                 {location ? (
-                  <p className="text-sm text-green-600 font-medium flex items-center gap-1.5">
-                    <CheckCircleIcon className="w-4 h-4" /> Verified within HQ Perimeter
-                  </p>
+                  <div>
+                    {location.distance <= HQ_RADIUS ? (
+                      <p className="text-sm text-green-600 font-medium flex items-center gap-1.5">
+                        <CheckCircleIcon className="w-4 h-4" /> Verified within perimeter ({location.distance}m)
+                      </p>
+                    ) : (
+                      <p className="text-sm text-red-600 font-medium flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4" /> Outside perimeter ({location.distance}m from HQ)
+                      </p>
+                    )}
+                  </div>
                 ) : (
                   <p className="text-sm text-orange-600 font-medium flex items-center gap-1.5">
                     <AlertCircle className="w-4 h-4" /> Location not verified

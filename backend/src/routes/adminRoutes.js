@@ -8,8 +8,16 @@ const {
   toggleManagerStatus,
   deleteManager,
   getManagers,
+  sendManagerCredentials,
   getOrders,
-  getAttendance
+  getAttendance,
+  createEmployee,
+  getEmployees,
+  toggleEmployeeStatus,
+  deleteEmployee,
+  sendEmployeeCredentials,
+  getEmailLogs,
+  retryEmail
 } = require('../controllers/adminController');
 const { auditActivity } = require('../middlewares/auditMiddleware');
 const { exportOrdersToExcel } = require('../controllers/exportController');
@@ -30,10 +38,26 @@ router.route('/managers/:id')
   .delete(auditActivity('MANAGER'), deleteManager);
 
 router.patch('/managers/:id/status', auditActivity('MANAGER'), toggleManagerStatus);
+router.post('/managers/:id/send-credentials', auditActivity('MANAGER'), sendManagerCredentials);
+
+// Employees
+router.route('/employees')
+  .get(getEmployees)
+  .post(auditActivity('EMPLOYEE'), createEmployee);
+
+router.route('/employees/:id')
+  .delete(auditActivity('EMPLOYEE'), deleteEmployee);
+
+router.patch('/employees/:id/status', auditActivity('EMPLOYEE'), toggleEmployeeStatus);
+router.post('/employees/:id/send-credentials', auditActivity('EMPLOYEE'), sendEmployeeCredentials);
 
 // Data Viewers
 router.get('/orders', getOrders);
 router.get('/orders/export', exportOrdersToExcel);
 router.get('/attendance', getAttendance);
+
+// Email Logs
+router.get('/emails', getEmailLogs);
+router.post('/emails/:id/retry', retryEmail);
 
 module.exports = router;

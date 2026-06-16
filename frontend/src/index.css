@@ -10,5 +10,25 @@
     color: #111827;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Disable sticky hover effects on touch-only devices */
+@media (hover: none) {
+  .hover\:shadow-md:hover {
+    box-shadow: none !important;
+  }
+  .hover\:shadow-lg:hover {
+    box-shadow: none !important;
+  }
+  .hover\:shadow-xl:hover {
+    box-shadow: none !important;
+  }
+  .hover\:bg-gray-100:hover {
+    background-color: inherit !important;
+  }
+  .hover\:bg-gray-50:hover {
+    background-color: inherit !important;
   }
 }

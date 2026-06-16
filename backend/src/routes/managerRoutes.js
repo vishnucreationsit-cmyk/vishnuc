@@ -9,9 +9,12 @@ const {
   createOrder,
   updateOrder,
   updateOrderStatus,
+  deliverOrder,
   getOrders,
+  getOrderById,
   getAttendance,
-  getDashboardStats
+  getDashboardStats,
+  sendEmployeeCredentials
 } = require('../controllers/managerController');
 const { auditActivity } = require('../middlewares/auditMiddleware');
 const { exportOrdersToExcel } = require('../controllers/exportController');
@@ -31,6 +34,7 @@ router.route('/employees/:id')
   .put(auditActivity('EMPLOYEE'), updateEmployee);
 
 router.patch('/employees/:id/status', auditActivity('EMPLOYEE'), toggleEmployeeStatus);
+router.post('/employees/:id/send-credentials', auditActivity('EMPLOYEE'), sendEmployeeCredentials);
 
 // Excel Export
 router.get('/orders/export', exportOrdersToExcel);
@@ -41,9 +45,11 @@ router.route('/orders')
   .post(auditActivity('ORDER'), createOrder);
 
 router.route('/orders/:id')
+  .get(getOrderById)
   .put(auditActivity('ORDER'), updateOrder);
 
 router.patch('/orders/:id/status', auditActivity('ORDER'), updateOrderStatus);
+router.post('/orders/:id/deliver', auditActivity('ORDER'), deliverOrder);
 
 // Attendance Management
 router.get('/attendance', getAttendance);

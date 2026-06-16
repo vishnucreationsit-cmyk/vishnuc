@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Edit2, Eye } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Search, Plus, Edit2, Eye, Edit } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import EditOrderModal from '../../components/orders/EditOrderModal';
 
 const ManagerOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -10,6 +11,10 @@ const ManagerOrders = () => {
   const [error, setError] = useState('');
   
   const { token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  // Edit Modal State
+  const [editingOrder, setEditingOrder] = useState(null);
 
   const fetchOrders = async () => {
     try {
@@ -33,21 +38,7 @@ const ManagerOrders = () => {
     if (token) fetchOrders();
   }, [token]);
 
-  const handleStatusChange = async (orderId, newStatus) => {
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/manager/orders/${orderId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-      if (res.ok) fetchOrders();
-    } catch (err) {
-      console.error('Error updating status', err);
-    }
-  };
+  // Status updates are now handled in OrderDetails.jsx
 
   const filteredOrders = orders.filter(order => 
     order.company.toLowerCase().includes(search.toLowerCase()) || 
@@ -113,24 +104,21 @@ const ManagerOrders = () => {
                       </span>
                     </td>
                     <td className="p-4">
-                      <select 
-                        value={order.status}
-                        onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                        className={`border border-gray-200 text-sm rounded-lg px-2 py-1 outline-none focus:border-blue-500 font-medium
-                          ${order.status === 'COMPLETED' || order.status === 'DELIVERED' ? 'bg-green-50 text-green-700' : 
-                            order.status === 'IN_PRODUCTION' ? 'bg-yellow-50 text-yellow-700' : 'bg-blue-50 text-blue-700'}`}
-                      >
-                        <option value="DRAFT">DRAFT</option>
-                        <option value="PENDING">PENDING</option>
-                        <option value="IN_PRODUCTION">IN PRODUCTION</option>
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="DELIVERED">DELIVERED</option>
-                        <option value="CANCELLED">CANCELLED</option>
-                      </select>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+                        ['Delivered', 'COMPLETED', 'DELIVERED'].includes(order.status) ? 'bg-green-50 text-green-700 border-green-200' : 
+                        ['Cancelled', 'CANCELLED'].includes(order.status) ? 'bg-red-50 text-red-700 border-red-200' : 
+                        ['Ready For Dispatch', 'Packing'].includes(order.status) ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                        'bg-blue-50 text-blue-700 border-blue-200'
+                      }`}>
+                        {order.status}
+                      </span>
                     </td>
-                    <td className="p-4 text-right">
-                      <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View/Edit">
-                        <Edit2 className="w-4 h-4" />
+                    <td className="p-4 text-right flex justify-end gap-2">
+                      <button onClick={() => setEditingOrder(order)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <Edit className="w-5 h-5" />
+                      </button>
+                      <button onClick={() => navigate(`/manager/orders/${order._id}`)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Details">
+                        <Eye className="w-5 h-5" />
                       </button>
                     </td>
                   </tr>
@@ -140,6 +128,17 @@ const ManagerOrders = () => {
           </table>
         </div>
       </div>
+
+      {/* Edit Order Modal */}
+      {editingOrder && (
+        <EditOrderModal 
+          order={editingOrder} 
+          onClose={() => setEditingOrder(null)} 
+          onRefresh={fetchOrders} 
+          token={token} 
+          isManager={true} 
+        />
+      )}
     </div>
   );
 };

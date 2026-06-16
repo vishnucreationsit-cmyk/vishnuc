@@ -40,7 +40,7 @@ const Products = () => {
 
         <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2">
           {products.map((product, index) => (
-            <div key={index} className="relative group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 p-8 flex flex-col md:flex-row gap-6 items-start">
+            <div key={index} className="relative group bg-white rounded-2xl shadow-sm md:hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 p-8 flex flex-col md:flex-row gap-6 items-start select-none">
               <div className={`flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br ${product.color} flex items-center justify-center text-white shadow-inner group-hover:scale-110 transition-transform duration-300`}>
                 <product.icon className="h-8 w-8" />
               </div>

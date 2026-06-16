@@ -48,15 +48,17 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const managerRoutes = require('./routes/managerRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/manager', managerRoutes);
 app.use('/api/employee', employeeRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Vishnu Creations ERP API is running securely...');
+  res.send('Vishnu Creations ERP API is running securely...'); // Trigger restart
 });
 
 // Global error handler

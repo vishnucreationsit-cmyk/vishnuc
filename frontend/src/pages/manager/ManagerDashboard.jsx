@@ -10,9 +10,9 @@ const ManagerDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
     stats: {
       totalEmployees: 0,
-      activeOrders: 0,
-      pendingOrders: 0,
-      completedOrders: 0
+      totalOrders: 0,
+      inProgressOrders: 0,
+      deliveredOrders: 0
     },
     monthlyProductionData: [],
     employeeAttendanceData: [],
@@ -40,9 +40,9 @@ const ManagerDashboard = () => {
 
   const stats = [
     { title: 'My Team', value: dashboardData.stats.totalEmployees, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { title: 'Active Orders', value: dashboardData.stats.activeOrders, icon: PackageSearch, color: 'text-purple-600', bg: 'bg-purple-100' },
-    { title: 'Pending Approvals', value: dashboardData.stats.pendingOrders, icon: Clock, color: 'text-orange-600', bg: 'bg-orange-100' },
-    { title: 'Completed Tasks', value: dashboardData.stats.completedOrders, icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
+    { title: 'My Orders', value: dashboardData.stats.totalOrders, icon: PackageSearch, color: 'text-purple-600', bg: 'bg-purple-100' },
+    { title: 'In Progress', value: dashboardData.stats.inProgressOrders, icon: Clock, color: 'text-orange-600', bg: 'bg-orange-100' },
+    { title: 'Delivered', value: dashboardData.stats.deliveredOrders, icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
   ];
 
   return (
@@ -54,7 +54,7 @@ const ManagerDashboard = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((card, idx) => (
-          <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 md:hover:shadow-md transition-shadow select-none">
             <div className={`inline-flex p-3 rounded-xl ${card.bg} ${card.color} mb-4`}>
               <card.icon className="w-6 h-6" />
             </div>
@@ -67,8 +67,8 @@ const ManagerDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Monthly Production - Area Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">Monthly Production Volume</h2>
-          <div className="h-72">
+          <h2 className="text-lg font-bold text-gray-900 mb-6">Production Volume (My Orders)</h2>
+          <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dashboardData.monthlyProductionData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
@@ -89,8 +89,8 @@ const ManagerDashboard = () => {
 
         {/* Employee Attendance - Line Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">Team Attendance (This Week)</h2>
-          <div className="h-72 flex items-center justify-center text-gray-400">
+          <h2 className="text-lg font-bold text-gray-900 mb-6">My Recent Orders</h2>
+          <div className="h-48 flex items-center justify-center text-gray-400">
              Attendance Reporting Temporarily Hidden
           </div>
         </div>

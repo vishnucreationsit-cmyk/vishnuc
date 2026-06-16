@@ -16,8 +16,8 @@ const ManagerAddOrder = () => {
     mobileNumber: '',
     productName: '',
     category: 'Electronics',
-    quantity: 1,
-    unitPrice: 0,
+    quantity: '',
+    unitPrice: '',
     totalValue: 0,
     orderDate: new Date().toISOString().split('T')[0],
     startDate: '',
@@ -31,7 +31,7 @@ const ManagerAddOrder = () => {
 
   // Auto calculate total value
   useEffect(() => {
-    const total = Number(formData.quantity) * Number(formData.unitPrice);
+    const total = Number(formData.quantity || 0) * Number(formData.unitPrice || 0);
     setFormData(prev => ({ ...prev, totalValue: total }));
   }, [formData.quantity, formData.unitPrice]);
 
@@ -220,13 +220,13 @@ const ManagerAddOrder = () => {
                   {errors.quantity && <p className="text-red-500 text-xs mt-1">{errors.quantity}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Unit Price ($)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Unit Price (₹)</label>
                   <input type="number" min="0" step="0.01" name="unitPrice" value={formData.unitPrice} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Total Value</label>
                   <div className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-100 font-bold text-gray-900">
-                    ${formData.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ₹{formData.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </div>
               </div>

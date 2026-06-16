@@ -67,9 +67,43 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['DRAFT', 'PENDING', 'IN_PRODUCTION', 'COMPLETED', 'DELIVERED', 'CANCELLED'],
-    default: 'PENDING',
+    enum: [
+      // Old Statuses (kept for backwards compatibility until migration)
+      'DRAFT', 'PENDING', 'IN_PRODUCTION', 'COMPLETED', 'DELIVERED', 'CANCELLED',
+      // New Advanced Workflow Statuses
+      'Draft', 'Order Created', 'Design Approved', 'Raw Material Procured', 
+      'Production Started', 'Cutting Completed', 'Stitching Completed', 
+      'Quality Check', 'Packing', 'Ready For Dispatch', 'Dispatched', 'Delivered', 'Cancelled'
+    ],
+    default: 'Order Created',
     index: true
+  },
+  images: [{
+    url: String,
+    publicId: String,
+    uploadedAt: { type: Date, default: Date.now }
+  }],
+  auditLogs: [{
+    action: String,
+    changedFields: mongoose.Schema.Types.Mixed,
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    date: { type: Date, default: Date.now },
+    notes: String
+  }],
+  statusHistory: [{
+    previousStatus: String,
+    newStatus: String,
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    date: { type: Date, default: Date.now },
+    notes: String
+  }],
+  deliveryDetails: {
+    date: Date,
+    deliveredTo: String,
+    receiverName: String,
+    receiverMobile: String,
+    notes: String,
+    proofImage: String
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

@@ -29,9 +29,11 @@ const checkIn = async (req, res) => {
     
     if (distance > hqRadius) {
       return res.status(403).json({ 
-        message: `Check-in rejected. You are ${Math.round(distance)} meters away from the office. Must be within ${hqRadius}m.` 
+        message: 'You are outside the company premises. Attendance is allowed only within 100 meters of the office location.'
       });
     }
+
+    location.distanceFromOffice = Math.round(distance);
 
     // Start and end of current day to check if already checked in
     const startOfDay = new Date();
@@ -64,6 +66,25 @@ const checkIn = async (req, res) => {
 
 const checkOut = async (req, res) => {
   try {
+    const location = req.body.location;
+
+    if (!location || !location.latitude || !location.longitude) {
+      return res.status(400).json({ message: 'GPS Location is required for check-out.' });
+    }
+
+    // Geo-fencing validation
+    const hqLat = parseFloat(process.env.HQ_LATITUDE);
+    const hqLng = parseFloat(process.env.HQ_LONGITUDE);
+    const hqRadius = parseFloat(process.env.HQ_RADIUS_METERS || 100);
+
+    const distance = getDistance(location.latitude, location.longitude, hqLat, hqLng);
+    
+    if (distance > hqRadius) {
+      return res.status(403).json({ 
+        message: 'You are outside the company premises. Attendance is allowed only within 100 meters of the office location.'
+      });
+    }
+
     const startOfDay = new Date();
     startOfDay.setHours(0,0,0,0);
     const endOfDay = new Date();

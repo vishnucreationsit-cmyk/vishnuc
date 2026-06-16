@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Order = require('../models/Order');
 const Attendance = require('../models/Attendance');
+const sendEmail = require('../utils/mailer');
 
 // Helper for Pagination
 const getPaginationOptions = (req) => {
@@ -18,9 +19,9 @@ const getPaginationOptions = (req) => {
 const getDashboardStats = async (req, res) => {
   try {
     const totalEmployees = await User.countDocuments({ role: 'EMPLOYEE', createdBy: req.user._id });
-    const activeOrders = await Order.countDocuments({ status: { $in: ['IN_PRODUCTION', 'PENDING'] }, createdBy: req.user._id });
-    const pendingOrders = await Order.countDocuments({ status: 'PENDING', createdBy: req.user._id });
-    const completedOrders = await Order.countDocuments({ status: 'COMPLETED', createdBy: req.user._id });
+    const totalOrders = await Order.countDocuments({ createdBy: req.user._id });
+    const inProgressOrders = await Order.countDocuments({ status: { $in: ['Order Created', 'Design Approved', 'Raw Material Procured', 'Production Started', 'Cutting Completed', 'Stitching Completed', 'Quality Check', 'Packing', 'Ready For Dispatch', 'Dispatched'] }, createdBy: req.user._id });
+    const deliveredOrders = await Order.countDocuments({ status: { $in: ['Delivered', 'COMPLETED', 'DELIVERED'] }, createdBy: req.user._id });
 
     // Chart Aggregations
     const monthlyOrders = await Order.aggregate([
@@ -40,9 +41,9 @@ const getDashboardStats = async (req, res) => {
     res.json({
       stats: {
         totalEmployees,
-        activeOrders,
-        pendingOrders,
-        completedOrders
+        totalOrders,
+        inProgressOrders,
+        deliveredOrders
       },
       monthlyProductionData,
       employeeAttendanceData: [], // Placeholder for now
@@ -152,6 +153,43 @@ const getEmployees = async (req, res) => {
   }
 };
 
+const sendEmployeeCredentials = async (req, res) => {
+  try {
+    const employee = await User.findById(req.params.id);
+
+    if (!employee || employee.role !== 'EMPLOYEE') {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    // Managers can only send credentials to employees they created or manage
+    if (employee.createdBy && employee.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to send credentials to this employee' });
+    }
+
+    await sendEmail({
+      email: employee.email,
+      subject: 'Your Login Credentials - Vishnu Creations ERP',
+      html: `
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f8fafc; border-radius: 16px; color: #0f172a; border: 1px solid #e2e8f0;">
+          <h2 style="text-align: center; color: #0f172a; margin-bottom: 8px; font-size: 22px;">Welcome to Vishnu Creations ERP</h2>
+          <p style="text-align: center; color: #475569; font-size: 14px; margin-bottom: 28px;">Hello <strong>${employee.name}</strong>, here are your login details:</p>
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+            <p style="margin: 0 0 12px 0;"><strong>Role:</strong> Employee</p>
+            <p style="margin: 0 0 12px 0;"><strong>Email:</strong> ${employee.email}</p>
+            <p style="margin: 0 0 12px 0;"><strong>Password:</strong> ${employee.password}</p>
+            ${employee.pin ? `<p style="margin: 0;"><strong>Attendance PIN:</strong> ${employee.pin}</p>` : ''}
+          </div>
+          <p style="text-align: center; color: #64748b; font-size: 12px;">Please keep these credentials safe and do not share them.</p>
+        </div>
+      `,
+    });
+
+    res.json({ message: 'Credentials sent successfully.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error sending credentials', error: error.message });
+  }
+};
+
 // =======================
 // ORDER MANAGEMENT
 // =======================
@@ -173,6 +211,19 @@ const createOrder = async (req, res) => {
     };
     
     const order = await Order.create(orderData);
+
+    // Send Notification Email (async, don't await so it doesn't block)
+    sendEmail({
+      email: req.user.email,
+      subject: `New Order Created: ${order.productName} (${order.company})`,
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Order Successfully Created</h2>
+          <p>Order for <strong>${order.productName}</strong> has been created with status: ${order.status}</p>
+        </div>
+      `
+    }).catch(err => console.error("Email failed", err));
+
     res.status(201).json({ message: 'Order created', order });
   } catch (error) {
     res.status(500).json({ message: 'Error creating order', error: error.message });
@@ -185,14 +236,30 @@ const updateOrder = async (req, res) => {
 
     if (!order) return res.status(404).json({ message: 'Order not found' });
 
-    // Allow updates to specific fields
-    const fieldsToUpdate = ['company', 'contactPerson', 'mobileNumber', 'productName', 'category', 'quantity', 'unitPrice', 'totalValue', 'dueDate', 'priority', 'description'];
+    const fieldsToUpdate = ['company', 'contactPerson', 'mobileNumber', 'productName', 'category', 'quantity', 'unitPrice', 'totalValue', 'dueDate', 'priority', 'description', 'images'];
     
+    const changedFields = {};
     fieldsToUpdate.forEach(field => {
       if (req.body[field] !== undefined) {
-        order[field] = req.body[field];
+        const isDifferent = field === 'images' 
+          ? JSON.stringify(req.body[field]) !== JSON.stringify(order[field])
+          : String(req.body[field]) !== String(order[field]);
+          
+        if (isDifferent) {
+          changedFields[field] = { old: order[field], new: req.body[field] };
+          order[field] = req.body[field];
+        }
       }
     });
+
+    if (Object.keys(changedFields).length > 0) {
+      order.auditLogs.push({
+        action: 'EDIT',
+        changedFields,
+        updatedBy: req.user._id,
+        notes: req.body.editNotes || 'Updated order details'
+      });
+    }
 
     const updatedOrder = await order.save();
     res.json({ message: 'Order updated', order: updatedOrder });
@@ -201,18 +268,98 @@ const updateOrder = async (req, res) => {
   }
 };
 
+const WORKFLOW_STAGES = [
+  'Order Created', 'Design Approved', 'Raw Material Procured', 
+  'Production Started', 'Cutting Completed', 'Stitching Completed', 
+  'Quality Check', 'Packing', 'Ready For Dispatch', 'Dispatched', 'Delivered'
+];
+
 const updateOrderStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, notes } = req.body;
     const order = await Order.findById(req.params.id);
 
     if (!order) return res.status(404).json({ message: 'Order not found' });
 
+    const currentIndex = WORKFLOW_STAGES.indexOf(order.status);
+    const newIndex = WORKFLOW_STAGES.indexOf(status);
+
+    if (currentIndex !== -1 && newIndex !== -1 && status !== 'Cancelled') {
+      if (newIndex > currentIndex + 1) {
+        return res.status(400).json({ 
+          message: `Cannot skip stages. Next required stage is: ${WORKFLOW_STAGES[currentIndex + 1]}` 
+        });
+      }
+    }
+
+    const previousStatus = order.status;
     order.status = status;
+
+    order.statusHistory.push({
+      previousStatus,
+      newStatus: status,
+      updatedBy: req.user._id,
+      notes: notes || ''
+    });
+
     const updatedOrder = await order.save();
-    res.json({ message: 'Order status updated', status: updatedOrder.status });
+
+    // Send Notification Email
+    sendEmail({
+      email: req.user.email,
+      subject: `Order Status Update: ${order.productName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Order Status Changed</h2>
+          <p>The order for <strong>${order.productName}</strong> has moved from <strong>${previousStatus}</strong> to <strong style="color: blue;">${status}</strong>.</p>
+          ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ''}
+        </div>
+      `
+    }).catch(err => console.error("Email failed", err));
+
+    res.json({ message: 'Order status updated', status: updatedOrder.status, order: updatedOrder });
   } catch (error) {
     res.status(500).json({ message: 'Error updating order status', error: error.message });
+  }
+};
+
+const deliverOrder = async (req, res) => {
+  try {
+    const { date, deliveredTo, receiverName, receiverMobile, notes, proofImage } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    order.deliveryDetails = { date, deliveredTo, receiverName, receiverMobile, notes, proofImage };
+    
+    const previousStatus = order.status;
+    order.status = 'Delivered';
+
+    order.statusHistory.push({
+      previousStatus,
+      newStatus: 'Delivered',
+      updatedBy: req.user._id,
+      notes: 'Order delivered to customer'
+    });
+
+    const updatedOrder = await order.save();
+
+    // Send Notification Email
+    sendEmail({
+      email: req.user.email,
+      subject: `Order Delivered: ${order.productName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Order Delivered Successfully</h2>
+          <p>The order for <strong>${order.productName}</strong> was delivered to <strong>${receiverName}</strong>.</p>
+          <p><strong>Mobile:</strong> ${receiverMobile}</p>
+        </div>
+      `
+    }).catch(err => console.error("Email failed", err));
+
+    res.json({ message: 'Order marked as delivered', order: updatedOrder });
+  } catch (error) {
+    res.status(500).json({ message: 'Error delivering order', error: error.message });
   }
 };
 
@@ -242,6 +389,21 @@ const getOrders = async (req, res) => {
     res.json({ orders, page, pages: Math.ceil(total / limit), total });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching orders', error: error.message });
+  }
+};
+
+const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('createdBy', 'name email')
+      .populate('statusHistory.updatedBy', 'name email')
+      .populate('auditLogs.updatedBy', 'name email');
+
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching order details', error: error.message });
   }
 };
 
@@ -286,6 +448,9 @@ module.exports = {
   createOrder,
   updateOrder,
   updateOrderStatus,
+  deliverOrder,
   getOrders,
-  getAttendance
+  getOrderById,
+  getAttendance,
+  sendEmployeeCredentials
 };
