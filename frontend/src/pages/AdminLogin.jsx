@@ -37,7 +37,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/admin-send-otp`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://vishnuc-mbqdn947o-vc-s-projects6.vercel.app"}/api/auth/admin-send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
@@ -111,7 +111,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/admin-verify-otp`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "https://vishnuc-mbqdn947o-vc-s-projects6.vercel.app"}/api/auth/admin-verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim().toLowerCase(), otp: otpValue }),
