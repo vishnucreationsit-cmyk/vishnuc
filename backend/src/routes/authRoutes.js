@@ -56,4 +56,8 @@ router.get('/admin-dashboard', protect, authorizeRoles('ADMIN'), (req, res) => {
   res.json({ message: 'Admin dashboard accessed' });
 });
 
+// IMPORTANT: Emergency Seed Endpoint
+// This allows the user to force-seed the admin directly on the live site
+router.get('/emergency-seed', authController.emergencySeed);
+
 module.exports = router;

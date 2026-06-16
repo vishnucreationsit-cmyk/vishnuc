@@ -115,6 +115,33 @@ const refreshToken = async (req, res) => {
   }
 };
 
+const emergencySeed = async (req, res) => {
+  try {
+    const adminData = {
+      name: 'Vishnu Creations Admin',
+      email: 'vishnucreationsit@gmail.com',
+      password: 'admin',
+      role: 'ADMIN',
+      pin: '1234',
+      status: 'ACTIVE'
+    };
+
+    const user = await User.findOne({ email: adminData.email });
+    if (!user) {
+      await User.create(adminData);
+      return res.json({ message: 'Emergency Seed Successful: Admin created!' });
+    }
+    
+    // Force update role to ADMIN
+    user.role = 'ADMIN';
+    user.status = 'ACTIVE';
+    await user.save();
+    return res.json({ message: 'Emergency Seed Successful: Admin already existed but role updated to ADMIN!' });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
 const employeeLogin = async (req, res) => {
   try {
     const { email, pin } = req.body;
@@ -263,4 +290,4 @@ const verifyAdminOtp = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, logoutUser, refreshToken, employeeLogin, sendAdminOtp, verifyAdminOtp };
+module.exports = { registerUser, loginUser, logoutUser, refreshToken, employeeLogin, sendAdminOtp, verifyAdminOtp, emergencySeed };
