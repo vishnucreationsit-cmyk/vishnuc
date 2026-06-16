@@ -33,6 +33,13 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Log all incoming requests to debug
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.url} - Origin: ${req.get('origin')}`);
+  if (req.method === 'POST') console.log(`[BODY]`, req.body);
+  next();
+});
+
 // Rate Limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
