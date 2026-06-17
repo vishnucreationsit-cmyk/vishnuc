@@ -90,7 +90,7 @@ const AnimatedLoginLayout = ({ title, subtitle, error, success, children }) => {
       <div className="max-w-5xl w-full flex flex-col md:flex-row items-center justify-center gap-8 lg:gap-16 relative z-10">
         
         {/* Left Side: Animated Lamp */}
-        <div className="hidden md:flex flex-col items-center justify-center w-1/2 relative">
+        <div className="flex flex-col items-center justify-center w-full md:w-1/2 relative">
           <motion.svg 
              className="lamp-svg" 
              viewBox="0 0 400 500" 
