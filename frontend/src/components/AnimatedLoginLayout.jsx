@@ -156,30 +156,30 @@ const AnimatedLoginLayout = ({ title, subtitle, error, success, children }) => {
               animate={{ fill: isLightOn ? '#ffffff' : '#9ca3af' }}
               transition={{ duration: 0.3 }}
             />
+
+            {/* Massive invisible hit area for mobile touch dragging and tapping */}
+            <motion.circle
+              cx="170"
+              cy="280"
+              r="80"
+              fill="transparent"
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 50 }}
+              dragElastic={0.2}
+              onDragEnd={handleDragEnd}
+              onClick={() => {
+                // Allow simple tap to toggle if they didn't drag it down
+                if (cordY.get() < 15) {
+                  playClickSound();
+                  setTimeout(() => playSwitchSound(), 100);
+                  setIsLightOn((prev) => !prev);
+                }
+              }}
+              style={{ y: cordY, cursor: 'grab', touchAction: 'none' }}
+              whileDrag={{ cursor: 'grabbing' }}
+              animate={controls}
+            />
           </motion.svg>
-          
-          {/* Invisible Draggable Overlay over the cord end */}
-          <motion.div
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 50 }}
-            dragElastic={0.2}
-            onDragEnd={handleDragEnd}
-            whileDrag={{ cursor: 'grabbing' }}
-            animate={controls}
-            className="absolute z-20"
-            style={{
-              y: cordY,
-              top: '56%',
-              left: '42.5%',
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              backgroundColor: 'transparent',
-              transform: 'translate(-50%, -50%)',
-              touchAction: 'none',
-              cursor: 'grab'
-            }}
-          />
         </div>
 
         {/* Right Side: Form */}
