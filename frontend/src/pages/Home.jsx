@@ -45,8 +45,8 @@ const Home = () => {
               { title: 'Premium Belts', desc: 'Full-grain leather belts with brass hardware.', img: 'https://images.unsplash.com/photo-1624222247344-550fb60583dc?q=80&w=800&auto=format&fit=crop' },
               { title: 'Luxury Wallets', desc: 'Minimalist bifolds and passport holders.', img: 'https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=800&auto=format&fit=crop' },
               { title: 'Corporate Gifts', desc: 'Custom embossed diaries, organizers, and folios.', img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800&auto=format&fit=crop' },
-              { title: 'Custom Orders', desc: 'Bespoke designs tailored exactly to your specifications.', img: 'https://images.unsplash.com/photo-1549420455-83f516a8027a?q=80&w=800&auto=format&fit=crop' },
-              { title: 'Accessories', desc: 'Keychains, cardholders, and fine leather watch straps.', img: 'https://images.unsplash.com/photo-1622350616149-14a0ec8a0f9b?q=80&w=800&auto=format&fit=crop' },
+              { title: 'Custom Orders', desc: 'Bespoke designs tailored exactly to your specifications.', img: '/images/custom_leather_orders.png' },
+              { title: 'Accessories', desc: 'Keychains, cardholders, and fine leather watch straps.', img: '/images/leather_accessories.png' },
             ].map((product, idx) => (
               <div key={idx} className="group relative overflow-hidden bg-black aspect-[4/5] cursor-pointer">
                 <img src={product.img} alt={product.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-700 group-hover:scale-105 transform" />
@@ -95,7 +95,7 @@ const Home = () => {
             <div className="lg:w-1/2 relative">
               <div className="absolute inset-0 border border-gold-500 translate-x-4 translate-y-4"></div>
               <img 
-                src="https://images.unsplash.com/photo-1542408985-06ab54807ee5?q=80&w=1000&auto=format&fit=crop" 
+                src="/images/leather_crafting_process.png" 
                 alt="Leather Crafting" 
                 className="relative z-10 w-full h-[600px] object-cover grayscale hover:grayscale-0 transition-all duration-1000"
               />

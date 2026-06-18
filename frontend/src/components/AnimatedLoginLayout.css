@@ -12,10 +12,22 @@
   filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5));
 }
 
-.lamp-base { fill: #d1d5db; }
-.lamp-stand { fill: #f3f4f6; }
-.lamp-shade { fill: #6b8c73; transition: fill 0.3s ease; }
-.lamp-shade.active { fill: #88c096; }
+.lamp-base {
+  fill: #d1d5db;
+}
+
+.lamp-stand {
+  fill: #f3f4f6;
+}
+
+.lamp-shade {
+  fill: #6b8c73;
+  transition: fill 0.3s ease;
+}
+
+.lamp-shade.active {
+  fill: #88c096;
+}
 
 .lamp-light {
   fill: url(#light-gradient);
@@ -28,16 +40,39 @@
   opacity: 0;
 }
 
-.lamp-eye { fill: #0d1117; }
-.lamp-mouth { fill: #0d1117; }
-.lamp-tongue { fill: #ef4444; }
+.lamp-eye {
+  fill: #0d1117;
+}
 
-.lamp-cord { stroke: #e5e7eb; stroke-width: 6; stroke-linecap: round; }
-.lamp-cord-end { fill: #ffffff; }
+.lamp-mouth {
+  fill: #0d1117;
+}
+
+.lamp-tongue {
+  fill: #ef4444;
+}
+
+.lamp-cord {
+  stroke: #e5e7eb;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.lamp-cord-end {
+  fill: #ffffff;
+}
 
 @keyframes blink {
-  0%, 96%, 98% { transform: scaleY(1); }
-  97% { transform: scaleY(0.1); }
+
+  0%,
+  96%,
+  98% {
+    transform: scaleY(1);
+  }
+
+  97% {
+    transform: scaleY(0.1);
+  }
 }
 
 .lamp-eyes-group {
